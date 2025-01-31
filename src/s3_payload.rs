@@ -1,16 +1,16 @@
 use crate::exports::edgee::protocols::data_collection::Dict;
 use anyhow::anyhow;
-use chrono::DateTime;
-use chrono::offset::Utc;
-use uuid::Uuid;
 use aws_credential_types::Credentials;
 use aws_sigv4::http_request::{
     sign, PayloadChecksumKind, SignableBody, SignableRequest, SigningParams, SigningSettings,
 };
 use aws_sigv4::sign::v4;
 use aws_smithy_runtime_api::client::identity::Identity;
+use chrono::offset::Utc;
+use chrono::DateTime;
 use std::collections::HashMap;
 use std::time::SystemTime;
+use uuid::Uuid;
 
 pub struct S3Config {
     pub access_key: String,
@@ -76,7 +76,8 @@ impl S3Config {
 
     pub fn generate_random_s3_key() -> String {
         let datetime: DateTime<Utc> = SystemTime::now().into();
-        format!("{}-{}.json",
+        format!(
+            "{}-{}.json",
             datetime.format("%Y-%m-%d-%H-%M-%S"),
             Uuid::new_v4().to_string(),
         )
@@ -96,11 +97,17 @@ impl S3Config {
         s3_url: String,
         file_content: String,
     ) -> Vec<(String, String)> {
+        let session_token = if self.session_token.is_empty() {
+            None
+        } else {
+            Some(self.session_token.clone())
+        };
+
         // create Identity with static Credentials
         let identity: Identity = Credentials::new(
             self.access_key.clone(),
             self.secret_key.clone(),
-            Some(self.session_token.clone()), // this could be empty
+            session_token,
             None,
             "hardcoded-credentials",
         )

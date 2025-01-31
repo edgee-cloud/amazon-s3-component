@@ -13,7 +13,6 @@ export!(Component);
 struct Component;
 
 impl Guest for Component {
-
     fn page(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
         send_to_s3(_edgee_event, _cred_map)
     }
@@ -31,8 +30,8 @@ fn send_to_s3(edgee_event: Event, creds: Dict) -> Result<EdgeeRequest, String> {
     let s3_config = s3_payload::S3Config::new(creds).map_err(|e| e.to_string())?;
 
     // serialize the entire event into JSON
-    let file_content = serde_json::to_string(&edgee_event).unwrap_or_else(| _ | "".to_string());
-    
+    let file_content = serde_json::to_string(&edgee_event).unwrap_or_else(|_| "".to_string());
+
     // generate full URL and HTTP headers
     let s3_url = s3_config.generate_s3_url(); // S3 key is auto-generated (.json)
     let sigv4_headers = s3_config.generate_s3_headers(s3_url.clone(), file_content.clone());
@@ -50,7 +49,7 @@ mod tests {
     use super::*;
 
     use crate::exports::edgee::protocols::data_collection::{
-        Campaign, Client, Context, Data, EventType, PageData, Session, UserData,
+        Campaign, Client, Context, Data, EventType, PageData, Session, TrackData, UserData,
     };
     use exports::edgee::protocols::data_collection::Consent;
     use pretty_assertions::assert_eq;
@@ -132,6 +131,18 @@ mod tests {
         }
     }
 
+    fn sample_track_data(event_name: String) -> TrackData {
+        return TrackData {
+            name: event_name,
+            products: vec![],
+            properties: vec![
+                ("prop1".to_string(), "value1".to_string()),
+                ("prop2".to_string(), "10".to_string()),
+                ("currency".to_string(), "USD".to_string()),
+            ],
+        };
+    }
+
     fn sample_page_event(
         consent: Option<Consent>,
         edgee_id: String,
@@ -150,6 +161,43 @@ mod tests {
         }
     }
 
+    fn sample_track_event(
+        event_name: String,
+        consent: Option<Consent>,
+        edgee_id: String,
+        locale: String,
+        session_start: bool,
+    ) -> Event {
+        return Event {
+            uuid: Uuid::new_v4().to_string(),
+            timestamp: 123,
+            timestamp_millis: 123,
+            timestamp_micros: 123,
+            event_type: EventType::Track,
+            data: Data::Track(sample_track_data(event_name)),
+            context: sample_context(edgee_id, locale, session_start),
+            consent: consent,
+        };
+    }
+
+    fn sample_user_event(
+        consent: Option<Consent>,
+        edgee_id: String,
+        locale: String,
+        session_start: bool,
+    ) -> Event {
+        return Event {
+            uuid: Uuid::new_v4().to_string(),
+            timestamp: 123,
+            timestamp_millis: 123,
+            timestamp_micros: 123,
+            event_type: EventType::User,
+            data: Data::User(sample_user_data(edgee_id.clone())),
+            context: sample_context(edgee_id, locale, session_start),
+            consent: consent,
+        };
+    }
+
     #[test]
     fn page_works_fine() {
         let event = sample_page_event(
@@ -158,14 +206,331 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = vec![("your-credentials".to_string(), "abc".to_string())];
+
+        let credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
         let result = Component::page(event, credentials);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
-        assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.is_empty(), true);
-        assert_eq!(edgee_request.url.starts_with("https://example.com/"), true);
+        assert_eq!(edgee_request.method, HttpMethod::Put);
+        assert_eq!(edgee_request.body.is_empty(), false);
+        assert_eq!(
+            edgee_request
+                .url
+                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+            true
+        );
+
+        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "authorization"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-content-sha256"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-date"),
+            true
+        );
         // add more checks (headers, querystring, etc.)
+    }
+
+    #[test]
+    fn track_works_fine() {
+        let event = sample_track_event(
+            "custom-event".to_string(),
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+
+        let credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::track(event, credentials);
+
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert_eq!(edgee_request.method, HttpMethod::Put);
+        assert_eq!(edgee_request.body.is_empty(), false);
+        assert_eq!(
+            edgee_request
+                .url
+                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+            true
+        );
+
+        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "authorization"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-content-sha256"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-date"),
+            true
+        );
+        // add more checks (headers, querystring, etc.)
+    }
+
+    #[test]
+    fn user_works_fine() {
+        let event = sample_user_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+
+        let credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::user(event, credentials);
+
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert_eq!(edgee_request.method, HttpMethod::Put);
+        assert_eq!(edgee_request.body.is_empty(), false);
+        assert_eq!(
+            edgee_request
+                .url
+                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+            true
+        );
+
+        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "authorization"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-content-sha256"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-date"),
+            true
+        );
+        // add more checks (headers, querystring, etc.)
+    }
+
+    #[test]
+    fn page_with_session_token() {
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+
+        let credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_session_token".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::page(event, credentials);
+
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert_eq!(edgee_request.method, HttpMethod::Put);
+        assert_eq!(edgee_request.body.is_empty(), false);
+        assert_eq!(
+            edgee_request
+                .url
+                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+            true
+        );
+
+        assert_eq!(edgee_request.headers.len(), 4);
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "authorization"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-content-sha256"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-date"),
+            true
+        );
+        assert_eq!(
+            edgee_request
+                .headers
+                .iter()
+                .any(|(key, _value)| key == "x-amz-security-token"),
+            true
+        );
+        // add more checks (headers, querystring, etc.)
+    }
+
+    #[test]
+    fn page_with_s3_key_prefix() {
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+
+        let credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+            ("s3_key_prefix".to_string(), "sub-folder/".to_string()),
+        ];
+        let result = Component::page(event, credentials);
+
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert_eq!(edgee_request.method, HttpMethod::Put);
+        assert_eq!(edgee_request.body.is_empty(), false);
+        assert_eq!(
+            edgee_request
+                .url
+                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+            true
+        );
+        assert_eq!(edgee_request.url.contains("sub-folder/"), true);
+    }
+
+    #[test]
+    fn breaks_without_credentials() {
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+        let mut credentials = vec![
+            //("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::page(event.clone(), credentials);
+        assert_eq!(result.is_err(), true);
+        assert_eq!(
+            result
+                .clone()
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("Missing AWS Access Key"),
+            true
+        );
+
+        // test without secret key
+        credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            //("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::page(event.clone(), credentials);
+        assert_eq!(result.is_err(), true);
+        assert_eq!(
+            result
+                .clone()
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("Missing AWS Secret Key"),
+            true
+        );
+
+        // test without region
+        credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            //("aws_region".to_string(), "eu-west-1".to_string()),
+            ("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::page(event.clone(), credentials);
+        assert_eq!(result.is_err(), true);
+        assert_eq!(
+            result
+                .clone()
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("Missing AWS region"),
+            true
+        );
+
+        // test without bucket
+        credentials = vec![
+            ("aws_access_key".to_string(), "TEST".to_string()),
+            ("aws_secret_key".to_string(), "TEST".to_string()),
+            ("aws_region".to_string(), "eu-west-1".to_string()),
+            //("s3_bucket".to_string(), "test-bucket".to_string()),
+        ];
+        let result = Component::page(event, credentials);
+        assert_eq!(result.is_err(), true);
+        assert_eq!(
+            result
+                .clone()
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("Missing S3 bucket"),
+            true
+        );
     }
 }
