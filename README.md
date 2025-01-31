@@ -84,6 +84,16 @@ Build command:
 make build
 ```
 
+Test command:
+```bash
+make test
+```
+
+Test coverage command:
+```bash
+make test.coverage[.html]
+```
+
 ### Contributing
 Interested in contributing? Read our [contribution guidelines](./CONTRIBUTING.md)
 
