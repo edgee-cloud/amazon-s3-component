@@ -64,7 +64,7 @@ credentials.s3_key_prefix = "sub-folder/" # Optional prefix for all S3 objects
 
 
 ### Event Controls
-Control which events are forwarded to Amplitude:
+Control which events are forwarded to S3:
 ```toml
 config.page_event_enabled = true   # Enable/disable page view tracking
 config.track_event_enabled = true  # Enable/disable custom event tracking
