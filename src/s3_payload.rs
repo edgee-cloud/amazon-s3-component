@@ -79,7 +79,7 @@ impl S3Config {
         format!(
             "{}-{}.json",
             datetime.format("%Y-%m-%d-%H-%M-%S"),
-            Uuid::new_v4().to_string(),
+            Uuid::new_v4(),
         )
     }
 
