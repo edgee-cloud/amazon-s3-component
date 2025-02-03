@@ -1,5 +1,5 @@
 use crate::exports::edgee::protocols::data_collection::Dict;
-use anyhow::anyhow;
+use anyhow::Context;
 use aws_credential_types::Credentials;
 use aws_sigv4::http_request::{
     sign, PayloadChecksumKind, SignableBody, SignableRequest, SigningParams, SigningSettings,
@@ -28,41 +28,18 @@ impl S3Config {
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
-        let access_key = match cred.get("aws_access_key") {
-            Some(key) => key,
-            None => return Err(anyhow!("Missing AWS Access Key")),
-        }
-        .to_string();
 
-        let secret_key = match cred.get("aws_secret_key") {
-            Some(key) => key,
-            None => return Err(anyhow!("Missing AWS Secret Key")),
-        }
-        .to_string();
+        let access_key = cred.get("aws_access_key").context("Missing AWS Access Key")?.to_string();
 
-        let session_token = match cred.get("aws_session_token") {
-            Some(key) => key,
-            None => "", // session token is optional
-        }
-        .to_string();
+        let secret_key = cred.get("aws_secret_key").context("Missing AWS Secret Key")?.to_string();
 
-        let region = match cred.get("aws_region") {
-            Some(key) => key,
-            None => return Err(anyhow!("Missing AWS region")),
-        }
-        .to_string();
+        let session_token = cred.get("aws_session_token").map(String::to_string).unwrap_or_default(); // optional
 
-        let bucket = match cred.get("s3_bucket") {
-            Some(key) => key,
-            None => return Err(anyhow!("Missing S3 bucket")),
-        }
-        .to_string();
+        let region = cred.get("aws_region").context("Missing AWS region")?.to_string();
 
-        let key_prefix = match cred.get("s3_key_prefix") {
-            Some(key) => key,
-            None => "", // key prefix is optional
-        }
-        .to_string();
+        let bucket = cred.get("s3_bucket").context("Missing S3 bucket")?.to_string();
+
+        let key_prefix = cred.get("s3_key_prefix").map(String::to_string).unwrap_or_default(); // optional
 
         Ok(Self {
             access_key,
