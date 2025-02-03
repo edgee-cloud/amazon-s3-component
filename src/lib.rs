@@ -13,16 +13,16 @@ export!(Component);
 struct Component;
 
 impl Guest for Component {
-    fn page(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(_edgee_event, _cred_map)
+    fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, cred_map)
     }
 
-    fn track(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(_edgee_event, _cred_map)
+    fn track(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, cred_map)
     }
 
-    fn user(_edgee_event: Event, _cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(_edgee_event, _cred_map)
+    fn user(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, cred_map)
     }
 }
 
@@ -30,7 +30,7 @@ fn send_to_s3(edgee_event: Event, creds: Dict) -> Result<EdgeeRequest, String> {
     let s3_config = s3_payload::S3Config::new(creds).map_err(|e| e.to_string())?;
 
     // serialize the entire event into JSON
-    let file_content = serde_json::to_string(&edgee_event).unwrap_or_else(|_| "".to_string());
+    let file_content = serde_json::to_string(&edgee_event).unwrap_or_default();
 
     // generate full URL and HTTP headers
     let s3_url = s3_config.generate_s3_url(); // S3 key is auto-generated (.json)
