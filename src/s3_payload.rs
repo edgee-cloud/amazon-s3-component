@@ -28,18 +28,35 @@ impl S3Config {
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
+        let access_key = cred
+            .get("aws_access_key")
+            .context("Missing AWS Access Key")?
+            .to_string();
 
-        let access_key = cred.get("aws_access_key").context("Missing AWS Access Key")?.to_string();
+        let secret_key = cred
+            .get("aws_secret_key")
+            .context("Missing AWS Secret Key")?
+            .to_string();
 
-        let secret_key = cred.get("aws_secret_key").context("Missing AWS Secret Key")?.to_string();
+        let session_token = cred
+            .get("aws_session_token")
+            .map(String::to_string)
+            .unwrap_or_default(); // optional
 
-        let session_token = cred.get("aws_session_token").map(String::to_string).unwrap_or_default(); // optional
+        let region = cred
+            .get("aws_region")
+            .context("Missing AWS region")?
+            .to_string();
 
-        let region = cred.get("aws_region").context("Missing AWS region")?.to_string();
+        let bucket = cred
+            .get("s3_bucket")
+            .context("Missing S3 bucket")?
+            .to_string();
 
-        let bucket = cred.get("s3_bucket").context("Missing S3 bucket")?.to_string();
-
-        let key_prefix = cred.get("s3_key_prefix").map(String::to_string).unwrap_or_default(); // optional
+        let key_prefix = cred
+            .get("s3_key_prefix")
+            .map(String::to_string)
+            .unwrap_or_default(); // optional
 
         Ok(Self {
             access_key,
