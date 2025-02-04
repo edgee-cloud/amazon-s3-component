@@ -49,26 +49,25 @@ The component maps Edgee events to S3 objects as follows:
 ### Basic Configuration
 ```toml
 [[destinations.data_collection]]
-name = "s3"
-component = "/var/edgee/components/s3.wasm"
-credentials.aws_access_key = "YOUR_AWS_ACCESS_KEY"
-credentials.aws_secret_key = "YOUR_AWS_SECRET_KEY"
-credentials.aws_region = "YOUR_AWS_REGION"
-credentials.s3_bucket = "YOUR_S3_BUCKET_NAME"
-forward_client_headers = false
+id = "s3"
+file = "/var/edgee/components/s3.wasm"
+settings.aws_access_key = "YOUR_AWS_ACCESS_KEY"
+settings.aws_secret_key = "YOUR_AWS_SECRET_KEY"
+settings.aws_region = "YOUR_AWS_REGION"
+settings.s3_bucket = "YOUR_S3_BUCKET_NAME"
 
 # Optional configurations
-credentials.aws_session_token = "YOUR_AWS_SESSION_TOKEN" # Useful for tests, not recommended in prod since it's short-lived
-credentials.s3_key_prefix = "sub-folder/" # Optional prefix for all S3 objects
+settings.aws_session_token = "YOUR_AWS_SESSION_TOKEN" # Useful for tests, not recommended in prod since it's short-lived
+settings.s3_key_prefix = "sub-folder/" # Optional prefix for all S3 objects
 ```
 
 
 ### Event Controls
 Control which events are forwarded to S3:
 ```toml
-config.page_event_enabled = true   # Enable/disable page view tracking
-config.track_event_enabled = true  # Enable/disable custom event tracking
-config.user_event_enabled = true   # Enable/disable user identification
+settings.edgee_page_event_enabled = true   # Enable/disable page view tracking
+settings.edgee_track_event_enabled = true  # Enable/disable custom event tracking
+settings.edgee_user_event_enabled = true   # Enable/disable user identification
 ```
 
 
