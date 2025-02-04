@@ -13,21 +13,21 @@ export!(Component);
 struct Component;
 
 impl Guest for Component {
-    fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(edgee_event, cred_map)
+    fn page(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, settings)
     }
 
-    fn track(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(edgee_event, cred_map)
+    fn track(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, settings)
     }
 
-    fn user(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        send_to_s3(edgee_event, cred_map)
+    fn user(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+        send_to_s3(edgee_event, settings)
     }
 }
 
-fn send_to_s3(edgee_event: Event, creds: Dict) -> Result<EdgeeRequest, String> {
-    let s3_config = s3_payload::S3Config::new(creds).map_err(|e| e.to_string())?;
+fn send_to_s3(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
+    let s3_config = s3_payload::S3Config::new(settings).map_err(|e| e.to_string())?;
 
     // serialize the entire event into JSON
     let file_content = serde_json::to_string(&edgee_event).unwrap_or_default();
@@ -41,6 +41,7 @@ fn send_to_s3(edgee_event: Event, creds: Dict) -> Result<EdgeeRequest, String> {
         url: s3_url,
         headers: sigv4_headers,
         body: file_content,
+        forward_client_headers: false,
     })
 }
 
@@ -207,13 +208,13 @@ mod tests {
             true,
         );
 
-        let credentials = vec![
+        let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event, credentials);
+        let result = Component::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -261,13 +262,13 @@ mod tests {
             true,
         );
 
-        let credentials = vec![
+        let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::track(event, credentials);
+        let result = Component::track(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -314,13 +315,13 @@ mod tests {
             true,
         );
 
-        let credentials = vec![
+        let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::user(event, credentials);
+        let result = Component::user(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -367,14 +368,14 @@ mod tests {
             true,
         );
 
-        let credentials = vec![
+        let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_session_token".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event, credentials);
+        let result = Component::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -428,14 +429,14 @@ mod tests {
             true,
         );
 
-        let credentials = vec![
+        let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
             ("s3_key_prefix".to_string(), "sub-folder/".to_string()),
         ];
-        let result = Component::page(event, credentials);
+        let result = Component::page(event, settings);
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -451,20 +452,20 @@ mod tests {
     }
 
     #[test]
-    fn breaks_without_credentials() {
+    fn breaks_without_settings() {
         let event = sample_page_event(
             Some(Consent::Granted),
             "abc".to_string(),
             "fr".to_string(),
             true,
         );
-        let mut credentials = vec![
+        let mut settings = vec![
             //("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event.clone(), credentials);
+        let result = Component::page(event.clone(), settings);
         assert_eq!(result.is_err(), true);
         assert_eq!(
             result
@@ -477,13 +478,13 @@ mod tests {
         );
 
         // test without secret key
-        credentials = vec![
+        settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             //("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event.clone(), credentials);
+        let result = Component::page(event.clone(), settings);
         assert_eq!(result.is_err(), true);
         assert_eq!(
             result
@@ -496,13 +497,13 @@ mod tests {
         );
 
         // test without region
-        credentials = vec![
+        settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             //("aws_region".to_string(), "eu-west-1".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event.clone(), credentials);
+        let result = Component::page(event.clone(), settings);
         assert_eq!(result.is_err(), true);
         assert_eq!(
             result
@@ -515,13 +516,13 @@ mod tests {
         );
 
         // test without bucket
-        credentials = vec![
+        settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
             ("aws_region".to_string(), "eu-west-1".to_string()),
             //("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
-        let result = Component::page(event, credentials);
+        let result = Component::page(event, settings);
         assert_eq!(result.is_err(), true);
         assert_eq!(
             result
