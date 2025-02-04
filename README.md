@@ -22,13 +22,12 @@ This component enables seamless integration between [Edgee](https://www.edgee.cl
 
 ```toml
 [[destinations.data_collection]]
-name = "s3"
-component = "/var/edgee/components/s3.wasm"
-credentials.aws_access_key = "YOUR_AWS_ACCESS_KEY"
-credentials.aws_secret_key = "YOUR_AWS_SECRET_KEY"
-credentials.aws_region = "YOUR_AWS_REGION"
-credentials.s3_bucket = "YOUR_S3_BUCKET_NAME"
-forward_client_headers = false
+id = "s3"
+file = "/var/edgee/components/s3.wasm"
+settings.aws_access_key = "YOUR_AWS_ACCESS_KEY"
+settings.aws_secret_key = "YOUR_AWS_SECRET_KEY"
+settings.aws_region = "YOUR_AWS_REGION"
+settings.s3_bucket = "YOUR_S3_BUCKET_NAME"
 ```
 
 
