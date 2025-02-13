@@ -1,6 +1,6 @@
 manifest_version = 1
 
-[package]
+[component]
 name = "amazon-s3"
 version = "0.2.1"
 category = "data-collection"
@@ -15,36 +15,36 @@ allowing you to collect and forward analytics events to your data lake on S3.
 All S3 objects are created under `{bucket}/{prefix}{random-key}.json` and contain a full JSON dump of the incoming event.
 '''
 
-[package.build]
+[component.build]
 command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/s3_component.wasm s3.wasm"
 output_path = "s3.wasm"
 
-[package.config-fields.aws_access_key]
+[component.settings.aws_access_key]
 title = "Your AWS Access Key"
 type = "string"
 required = true
 
-[package.config-fields.aws_secret_key]
+[component.settings.aws_secret_key]
 title = "Your AWS Secret Access Key"
 type = "string"
 required = true
 
-[package.config-fields.aws_session_token]
+[component.settings.aws_session_token]
 title = "Your AWS Session Token (optional)"
 type = "string"
 description = "Useful for tests, not recommended in production because it's short-lived"
 
-[package.config-fields.aws_region]
+[component.settings.aws_region]
 title = "Your AWS Region"
 type = "string"
 required = true
 
-[package.config-fields.s3_bucket]
+[component.settings.s3_bucket]
 title = "Your bucket name"
 type = "string"
 required = true
 
-[package.config-fields.s3_key_prefix]
+[component.settings.s3_key_prefix]
 title = "Your key prefix (optional)"
 type = "string"
 description = "It will be used as key prefix for all S3 objects"
