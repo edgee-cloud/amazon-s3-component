@@ -26,15 +26,15 @@ impl Guest for Component {
     }
 }
 
-fn send_to_s3(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
-    let s3_config = s3_payload::S3Config::new(settings).map_err(|e| e.to_string())?;
+fn send_to_s3(edgee_event: Event, settings_dict: Dict) -> Result<EdgeeRequest, String> {
+    let s3_settings = s3_payload::Settings::new(settings_dict).map_err(|e| e.to_string())?;
 
     // serialize the entire event into JSON
     let file_content = serde_json::to_string(&edgee_event).unwrap_or_default();
 
     // generate full URL and HTTP headers
-    let s3_url = s3_config.generate_s3_url(); // S3 key is auto-generated (.json)
-    let sigv4_headers = s3_config.generate_s3_headers(s3_url.clone(), file_content.clone());
+    let s3_url = s3_settings.generate_s3_url(); // S3 key is auto-generated (.json)
+    let sigv4_headers = s3_settings.generate_s3_headers(s3_url.clone(), file_content.clone());
 
     Ok(EdgeeRequest {
         method: HttpMethod::Put,
