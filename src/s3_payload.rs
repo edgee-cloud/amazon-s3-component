@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::time::SystemTime;
 use uuid::Uuid;
 
-pub struct S3Config {
+pub struct Settings {
     pub access_key: String,
     pub secret_key: String,
     pub session_token: String, // could be empty
@@ -21,39 +21,39 @@ pub struct S3Config {
     pub key_prefix: String, // could be empty
 }
 
-impl S3Config {
-    pub fn new(cred_map: Dict) -> anyhow::Result<Self> {
-        let cred: HashMap<String, String> = cred_map
+impl Settings {
+    pub fn new(settings_dict: Dict) -> anyhow::Result<Self> {
+        let settings_map: HashMap<String, String> = settings_dict
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
-        let access_key = cred
+        let access_key = settings_map
             .get("aws_access_key")
             .context("Missing AWS Access Key")?
             .to_string();
 
-        let secret_key = cred
+        let secret_key = settings_map
             .get("aws_secret_key")
             .context("Missing AWS Secret Key")?
             .to_string();
 
-        let session_token = cred
+        let session_token = settings_map
             .get("aws_session_token")
             .map(String::to_string)
             .unwrap_or_default(); // optional
 
-        let region = cred
+        let region = settings_map
             .get("aws_region")
             .context("Missing AWS region")?
             .to_string();
 
-        let bucket = cred
+        let bucket = settings_map
             .get("s3_bucket")
             .context("Missing S3 bucket")?
             .to_string();
 
-        let key_prefix = cred
+        let key_prefix = settings_map
             .get("s3_key_prefix")
             .map(String::to_string)
             .unwrap_or_default(); // optional
