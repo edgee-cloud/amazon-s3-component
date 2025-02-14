@@ -1,8 +1,8 @@
-manifest_version = 1
+manifest-version = 1
 
 [component]
 name = "amazon-s3"
-version = "0.2.1"
+version = "0.2.2"
 category = "data-collection"
 subcategory = "warehouse"
 wit-world-version = "0.4.0"
