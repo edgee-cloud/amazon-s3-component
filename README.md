@@ -22,7 +22,7 @@ This component enables seamless integration between [Edgee](https://www.edgee.cl
 
 ```toml
 [[destinations.data_collection]]
-id = "s3"
+id = "amazon-s3"
 file = "/var/edgee/components/s3.wasm"
 settings.aws_access_key = "YOUR_AWS_ACCESS_KEY"
 settings.aws_secret_key = "YOUR_AWS_SECRET_KEY"
@@ -48,7 +48,7 @@ The component maps Edgee events to S3 objects as follows:
 ### Basic Configuration
 ```toml
 [[destinations.data_collection]]
-id = "s3"
+id = "amazon-s3"
 file = "/var/edgee/components/s3.wasm"
 settings.aws_access_key = "YOUR_AWS_ACCESS_KEY"
 settings.aws_secret_key = "YOUR_AWS_SECRET_KEY"
@@ -79,7 +79,7 @@ Prerequisites:
 
 Build command:
 ```bash
-make build
+edgee component build
 ```
 
 Test command:
