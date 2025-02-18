@@ -71,5 +71,4 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: taiki-e/install-action@cargo-llvm-cov
       - run: make test.coverage.lcov
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2
+      - uses: coverallsapp/github-action@v2
