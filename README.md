@@ -11,6 +11,11 @@
 
 <h1 align="center">Amazon S3 component for Edgee</h1>
 
+[![Coverage Status](https://coveralls.io/repos/github/edgee-cloud/amazon-s3-component/badge.svg?branch=coveralls)](https://coveralls.io/github/edgee-cloud/amazon-s3-component?branch=coveralls)
+[![GitHub issues](https://img.shields.io/github/issues/edgee-cloud/amazon-s3-component.svg)](https://github.com/edgee-cloud/amazon-s3-component/issues)
+[![Edgee Component Registry](https://img.shields.io/badge/Edgee_Component_Registry-Public-green.svg)](https://www.edgee.cloud/edgee/amazon-s3-component)
+
+
 This component enables seamless integration between [Edgee](https://www.edgee.cloud) and [Amazon S3](https://aws.amazon.com/s3/), allowing you to collect and forward analytics events to your data lake on S3.
 
 

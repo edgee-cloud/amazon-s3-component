@@ -74,5 +74,3 @@ jobs:
       - run: make test.coverage.lcov
       - name: Coveralls
         uses: coverallsapp/github-action@v2
-        with:
-          debug: true
