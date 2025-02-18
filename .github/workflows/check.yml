@@ -50,8 +50,8 @@ jobs:
       - run: edgee component build
       - name: Verify .wasm file exists
         run: |
-          if [ ! -f "./kinesis.wasm" ]; then
-              echo "❌ Error: kinesis.wasm not found" >&2
+          if [ ! -f "./s3.wasm" ]; then
+              echo "❌ Error: s3.wasm not found" >&2
               exit 1
           fi
 
