@@ -65,7 +65,7 @@ jobs:
       - run: make test
 
   coverage:
-    name: generate and upload coverage
+    name: coverage & coveralls
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,5 +74,5 @@ jobs:
       - run: make test.coverage.lcov
       - name: Coveralls
         uses: coverallsapp/github-action@v2
-        env:
-          NODE_COVERALLS_DEBUG: 1
+        with:
+          debug: true
