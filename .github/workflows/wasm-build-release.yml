@@ -19,8 +19,8 @@ jobs:
         run: rustup target add wasm32-wasip2
       - name: Install wasm-tools
         run: cargo install --locked wasm-tools
-      - name: Build WASM
-        run: make build
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
       - name: Upload WASM to release
         uses: actions/upload-release-asset@v1
         env:

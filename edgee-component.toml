@@ -1,13 +1,13 @@
 manifest-version = 1
 
 [component]
-name = "amazon-s3"
+name = "Amazon S3"
 version = "0.2.2"
 category = "data-collection"
 subcategory = "warehouse"
 wit-world-version = "0.4.0"
-documentation = "https://github.com/edgee-cloud/s3-component/"
-repository = "https://github.com/edgee-cloud/s3-component/"
+documentation = "https://github.com/edgee-cloud/amazon-s3-component/"
+repository = "https://github.com/edgee-cloud/amazon-s3-component/"
 description = '''
 This component enables seamless integration between [Edgee](https://www.edgee.cloud) and [Amazon S3](https://aws.amazon.com/s3/),
 allowing you to collect and forward analytics events to your data lake on S3. 
