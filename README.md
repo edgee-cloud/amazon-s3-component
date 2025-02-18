@@ -11,7 +11,7 @@
 
 <h1 align="center">Amazon S3 component for Edgee</h1>
 
-[![Coverage Status](https://coveralls.io/repos/github/edgee-cloud/amazon-s3-component/badge.svg?branch=coveralls)](https://coveralls.io/github/edgee-cloud/amazon-s3-component?branch=coveralls)
+[![Coverage Status](https://coveralls.io/repos/github/edgee-cloud/amazon-s3-component/badge.svg)](https://coveralls.io/github/edgee-cloud/amazon-s3-component)
 [![GitHub issues](https://img.shields.io/github/issues/edgee-cloud/amazon-s3-component.svg)](https://github.com/edgee-cloud/amazon-s3-component/issues)
 [![Edgee Component Registry](https://img.shields.io/badge/Edgee_Component_Registry-Public-green.svg)](https://www.edgee.cloud/edgee/amazon-s3-component)
 
