@@ -46,6 +46,7 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           target: wasm32-wasip2 # WebAssembly target
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
       - run: edgee component build
       - name: Verify .wasm file exists
         run: |
