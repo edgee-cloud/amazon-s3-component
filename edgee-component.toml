@@ -2,7 +2,7 @@ manifest-version = 1
 
 [component]
 name = "Amazon S3"
-version = "0.2.2"
+version = "0.2.3"
 category = "data-collection"
 subcategory = "warehouse"
 wit-world-version = "0.4.0"
