@@ -3,7 +3,6 @@ name: Build and Release WASM
 permissions:
   contents: write
 on:
-  pull_request:
   release:
     types: [ published ]
 
