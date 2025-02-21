@@ -1,4 +1,4 @@
-use crate::exports::edgee::protocols::data_collection::Dict;
+use crate::exports::edgee::components::data_collection::Dict;
 use anyhow::Context;
 use aws_credential_types::Credentials;
 use aws_sigv4::http_request::{
