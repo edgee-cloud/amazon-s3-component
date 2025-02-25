@@ -1,5 +1,5 @@
-use crate::exports::edgee::protocols::data_collection::{Dict, EdgeeRequest, Event, HttpMethod};
-use exports::edgee::protocols::data_collection::Guest;
+use crate::exports::edgee::components::data_collection::{Dict, EdgeeRequest, Event, HttpMethod};
+use exports::edgee::components::data_collection::Guest;
 mod s3_payload;
 
 wit_bindgen::generate!({
@@ -49,10 +49,10 @@ fn send_to_s3(edgee_event: Event, settings_dict: Dict) -> Result<EdgeeRequest, S
 mod tests {
     use super::*;
 
-    use crate::exports::edgee::protocols::data_collection::{
+    use crate::exports::edgee::components::data_collection::{
         Campaign, Client, Context, Data, EventType, PageData, Session, TrackData, UserData,
     };
-    use exports::edgee::protocols::data_collection::Consent;
+    use exports::edgee::components::data_collection::Consent;
     use pretty_assertions::assert_eq;
     use uuid::Uuid;
 
