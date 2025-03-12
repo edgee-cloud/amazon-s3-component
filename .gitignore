@@ -4,6 +4,7 @@ debug/
 target/
 s3.wasm
 lcov.info
+.edgee/
 
 
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries
