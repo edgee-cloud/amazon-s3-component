@@ -87,7 +87,11 @@ impl Settings {
     }
 
     pub fn generate_s3_host(&self) -> String {
-        format!("{}.s3.amazonaws.com", self.bucket.clone())
+        format!(
+            "{}.s3.{}.amazonaws.com",
+            self.bucket.clone(),
+            self.region.clone(),
+        )
     }
 
     pub fn generate_s3_headers(
