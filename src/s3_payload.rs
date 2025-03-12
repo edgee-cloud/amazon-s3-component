@@ -98,12 +98,10 @@ impl Settings {
         };
 
         // create Identity with static Credentials
-        let identity: Identity = Credentials::new(
+        let identity: Identity = Credentials::from_keys(
             self.access_key.clone(),
             self.secret_key.clone(),
             session_token,
-            None,
-            "hardcoded-credentials",
         )
         .into();
 
