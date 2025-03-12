@@ -79,10 +79,18 @@ impl Settings {
 
     pub fn generate_s3_url(&self) -> String {
         format!(
-            "https://{}.s3.amazonaws.com/{}{}",
-            self.bucket.clone(),
+            "https://{}/{}{}",
+            self.generate_s3_host(),
             self.key_prefix.clone(), // could be empty
             Self::generate_random_s3_key(),
+        )
+    }
+
+    pub fn generate_s3_host(&self) -> String {
+        format!(
+            "{}.s3.{}.amazonaws.com",
+            self.bucket.clone(),
+            self.region.clone(),
         )
     }
 
@@ -135,9 +143,13 @@ impl Settings {
             .into_parts();
 
         // convert to Vec<(String, String)>
-        signing_instructions
+        let mut headers: Vec<(String, String)> = signing_instructions
             .headers()
             .map(|(key, value)| (key.to_string(), value.to_string()))
-            .collect()
+            .collect();
+
+        headers.extend(vec![("host".to_string(), self.generate_s3_host())]);
+
+        headers
     }
 }
