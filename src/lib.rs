@@ -223,11 +223,11 @@ mod tests {
         assert_eq!(
             edgee_request
                 .url
-                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+                .starts_with("https://test-bucket.s3.eu-west-1.amazonaws.com/"),
             true
         );
 
-        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(edgee_request.headers.len(), 4);
         assert_eq!(
             edgee_request
                 .headers
@@ -265,7 +265,7 @@ mod tests {
         let settings = vec![
             ("aws_access_key".to_string(), "TEST".to_string()),
             ("aws_secret_key".to_string(), "TEST".to_string()),
-            ("aws_region".to_string(), "eu-west-1".to_string()),
+            ("aws_region".to_string(), "eu-west-2".to_string()),
             ("s3_bucket".to_string(), "test-bucket".to_string()),
         ];
         let result = Component::track(event, settings);
@@ -277,11 +277,11 @@ mod tests {
         assert_eq!(
             edgee_request
                 .url
-                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+                .starts_with("https://test-bucket.s3.eu-west-2.amazonaws.com/"),
             true
         );
 
-        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(edgee_request.headers.len(), 4);
         assert_eq!(
             edgee_request
                 .headers
@@ -330,11 +330,11 @@ mod tests {
         assert_eq!(
             edgee_request
                 .url
-                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+                .starts_with("https://test-bucket.s3.eu-west-1.amazonaws.com/"),
             true
         );
 
-        assert_eq!(edgee_request.headers.len(), 3);
+        assert_eq!(edgee_request.headers.len(), 4);
         assert_eq!(
             edgee_request
                 .headers
@@ -384,11 +384,11 @@ mod tests {
         assert_eq!(
             edgee_request
                 .url
-                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+                .starts_with("https://test-bucket.s3.eu-west-1.amazonaws.com/"),
             true
         );
 
-        assert_eq!(edgee_request.headers.len(), 4);
+        assert_eq!(edgee_request.headers.len(), 5);
         assert_eq!(
             edgee_request
                 .headers
@@ -445,7 +445,7 @@ mod tests {
         assert_eq!(
             edgee_request
                 .url
-                .starts_with("https://test-bucket.s3.amazonaws.com/"),
+                .starts_with("https://test-bucket.s3.eu-west-1.amazonaws.com/"),
             true
         );
         assert_eq!(edgee_request.url.contains("sub-folder/"), true);
