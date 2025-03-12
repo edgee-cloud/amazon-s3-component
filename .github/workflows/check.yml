@@ -6,16 +6,18 @@ on:
   pull_request:
 
 jobs:
-  #check:
-  #  name: cargo check
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - uses: dtolnay/rust-toolchain@stable
-  #      with:
-  #        target: wasm32-wasip2 # WebAssembly target
-  #        components: rustfmt
-  #    - run: cargo check
+  check:
+    name: cargo check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: wasm32-wasip2 # WebAssembly target
+          components: rustfmt
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
+      - run: cargo check
   fmt:
     name: cargo fmt
     runs-on: ubuntu-latest
@@ -24,6 +26,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
+          target: wasm32-wasip2 # WebAssembly target
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
       - uses: actions-rust-lang/rustfmt@v1
   clippy:
     name: clippy
@@ -35,6 +40,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
+          target: wasm32-wasip2 # WebAssembly target
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
       - uses: wearerequired/lint-action@master
         with:
           clippy: true
@@ -61,6 +69,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: wasm32-wasip2 # WebAssembly target
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
       - run: make test
 
   coverage:
@@ -69,6 +81,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: wasm32-wasip2 # WebAssembly target
       - uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: edgee-cloud/install-edgee-cli@v0.1.0
+      - run: edgee component build
       - run: make test.coverage.lcov
       - uses: coverallsapp/github-action@v2
