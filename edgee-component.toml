@@ -2,7 +2,7 @@ manifest-version = 1
 
 [component]
 name = "Amazon S3"
-version = "1.1.0"
+version = "1.2.0"
 category = "data-collection"
 subcategory = "warehouse"
 wit-version = "1.0.0"
@@ -26,28 +26,32 @@ output_path = "s3.wasm"
 title = "Your AWS Access Key"
 type = "string"
 required = true
+description = "It corresponds to aws_access_key_id in your credentials file."
 
 [component.settings.aws_secret_key]
 title = "Your AWS Secret Access Key"
 type = "string"
 required = true
+description = "It corresponds to aws_secret_access_key in your credentials file."
 
 [component.settings.aws_session_token]
 title = "Your AWS Session Token (optional)"
 type = "string"
-description = "Useful for tests, not recommended in production because it's short-lived"
+description = "Useful for tests, not recommended in production because it's short-lived."
 
 [component.settings.aws_region]
 title = "Your AWS Region"
 type = "string"
 required = true
+description = "The AWS region short name, such as us-east-1 or eu-west-1."
 
 [component.settings.s3_bucket]
 title = "Your bucket name"
 type = "string"
 required = true
+description = "Simply the bucket name, make sure to avoid leading or ending spaces."
 
 [component.settings.s3_key_prefix]
 title = "Your key prefix (optional)"
 type = "string"
-description = "It will be used as key prefix for all S3 objects"
+description = "It will be used as key prefix for all S3 objects. Make sure it ends with a slash if you want sub-folders."
