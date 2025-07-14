@@ -80,7 +80,6 @@ settings.edgee_user_event_enabled = true   # Enable/disable user identification
 ### Building from Source
 Prerequisites:
 - [Rust](https://www.rust-lang.org/tools/install)
-- wit-deps: `cargo install wit-deps`
 
 Build command:
 ```bash
