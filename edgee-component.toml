@@ -19,7 +19,7 @@ All S3 objects are created under '{bucket}/{prefix}{random-key}.json' and contai
 '''
 
 [component.build]
-command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/s3_component.wasm s3.wasm"
+command = "cargo build --target wasm32-wasip2 --release && rm -f s3.wasm && cp ./target/wasm32-wasip2/release/s3_component.wasm s3.wasm"
 output_path = "s3.wasm"
 
 [component.settings.aws_access_key]
